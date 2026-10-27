@@ -1,8 +1,8 @@
-# ava-page
+# Ava Browser — site
 
 The single-page site for [Ava](https://github.com/Ava-Browser/ava), a native macOS browser built on the Ladybird engine.
 
-Serve at <https://ava-browser.github.io/ava-page/>. One HTML file, no build step, no dependencies, no cookies, no analytics.
+Serve at <https://ava-browser.github.io/>. One HTML file, no build step, no dependencies, no cookies, no analytics.
 
 ## Editing
 
