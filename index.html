@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ava — a native macOS browser on the Ladybird engine</title>
-<meta name="description" content="A native macOS browser built in Swift and SwiftUI on the Ladybird engine. Vertical tabs, persistent Spaces, native Mac controls.">
+<meta name="description" content="A native macOS browser, built on the Ladybird engine.">
 <meta name="theme-color" content="#F3F1EB" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1B1C1E" media="(prefers-color-scheme: dark)">
 <meta property="og:title" content="Ava — a native macOS browser">
-<meta property="og:description" content="Swift and SwiftUI on the Ladybird engine. Vertical tabs, persistent Spaces.">
+<meta property="og:description" content="Built on the Ladybird engine.">
 <meta property="og:type" content="website">
 <link rel="icon" href="ava-lift.svg" type="image/svg+xml">
 <style>
@@ -19,7 +19,6 @@
     --faint: #8A8D86;
     --tile: #FAF9F6;
     --line: rgba(36, 39, 40, .10);
-    --line-strong: rgba(36, 39, 40, .16);
     --btn-bg: #242728;
     --btn-ink: #F6F4EF;
     --shadow: 0 1px 2px rgba(36, 39, 40, .06), 0 12px 32px -12px rgba(36, 39, 40, .18);
@@ -32,7 +31,6 @@
       --faint: #7C817A;
       --tile: #242728;
       --line: rgba(243, 241, 235, .10);
-      --line-strong: rgba(243, 241, 235, .18);
       --btn-bg: #F3F1EB;
       --btn-ink: #1B1C1E;
       --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 12px 32px -12px rgba(0, 0, 0, .55);
@@ -71,16 +69,22 @@
   .hero {
     width: 100%;
     min-width: 0;
-    max-width: 33rem;
-    text-align: center;
+    max-width: 30rem;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     justify-items: center;
-    gap: clamp(13px, 2.2vh, 24px);
+    gap: clamp(16px, 2.6vh, 28px);
+    text-align: center;
+  }
+
+  .lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: clamp(12px, 1.6vw, 18px);
   }
 
   .mark {
-    width: clamp(64px, 9vh, 104px);
+    width: clamp(56px, 8vh, 92px);
     aspect-ratio: 1;
     border-radius: 23.5%;
     background: var(--tile);
@@ -88,12 +92,13 @@
     box-shadow: var(--shadow);
     display: grid;
     place-items: center;
+    flex: none;
   }
   .mark svg { width: 58%; height: 58%; display: block; }
 
   h1 {
     margin: 0;
-    font-size: clamp(2rem, 2.2vh + 2.4vw, 3.15rem);
+    font-size: clamp(2rem, 2.2vh + 2.2vw, 3rem);
     font-weight: 600;
     letter-spacing: -.035em;
     line-height: 1;
@@ -101,8 +106,8 @@
 
   .lede {
     margin: 0;
-    max-width: 26rem;
-    font-size: clamp(1rem, 1.5vh + .4vw, 1.24rem);
+    max-width: 24rem;
+    font-size: clamp(1rem, 1.5vh + .4vw, 1.22rem);
     font-weight: 450;
     letter-spacing: -.014em;
     line-height: 1.42;
@@ -110,29 +115,11 @@
     text-wrap: pretty;
   }
 
-  .features {
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0 10px;
-    font-size: .82rem;
-    letter-spacing: .004em;
-    color: var(--faint);
-  }
-  .features span { display: inline-flex; align-items: center; gap: 10px; }
-  .features span + span::before {
-    content: "";
-    width: 3px; height: 3px;
-    border-radius: 50%;
-    background: var(--line-strong);
-  }
-
   .links {
     display: grid;
-    gap: clamp(11px, 1.7vh, 17px);
+    gap: clamp(12px, 1.8vh, 18px);
     justify-items: center;
-    padding-top: clamp(2px, 1vh, 10px);
+    padding-top: clamp(2px, 1vh, 8px);
   }
 
   .primary {
@@ -154,59 +141,41 @@
   .primary svg { width: 15px; height: 15px; display: block; }
 
   .secondary {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 2px 6px;
-    max-width: 100%;
     font-size: .88rem;
-  }
-  .secondary a {
     color: var(--muted);
     text-decoration: none;
     padding: 4px 8px;
     border-radius: 7px;
     transition: color 140ms ease-out, background-color 140ms ease-out;
   }
-  .secondary a:hover { color: var(--ink); background: var(--line); }
-  .secondary .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--line-strong); }
+  .secondary:hover { color: var(--ink); background: var(--line); }
 
   footer {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px 16px;
-    overflow-wrap: anywhere;
+    justify-content: center;
     padding-top: clamp(8px, 1.6vh, 16px);
     border-top: 1px solid var(--line);
     font-size: .74rem;
     color: var(--faint);
     letter-spacing: .005em;
+    text-align: center;
   }
 
   .hero > * { animation: rise 520ms cubic-bezier(.22, .8, .28, 1) backwards; }
   .hero > *:nth-child(1) { animation-delay: 40ms; }
-  .hero > *:nth-child(2) { animation-delay: 90ms; }
-  .hero > *:nth-child(3) { animation-delay: 140ms; }
-  .hero > *:nth-child(4) { animation-delay: 190ms; }
-  .hero > *:nth-child(5) { animation-delay: 240ms; }
+  .hero > *:nth-child(2) { animation-delay: 100ms; }
+  .hero > *:nth-child(3) { animation-delay: 160ms; }
   @keyframes rise {
     from { opacity: 0; transform: translateY(7px); }
     to   { opacity: 1; transform: none; }
   }
 
-  @media (max-height: 620px) {
-    .hero { gap: clamp(9px, 1.6vh, 14px); }
-    .mark { width: clamp(48px, 7vh, 64px); }
-    footer { font-size: .68rem; }
+  @media (max-height: 480px) {
+    .hero { gap: clamp(10px, 1.8vh, 14px); }
+    .mark { width: clamp(40px, 6.5vh, 56px); }
   }
-  @media (max-height: 460px) {
-    .mark, .features { display: none; }
-  }
-  @media (max-width: 420px) {
-    .features { font-size: .78rem; }
+  @media (max-width: 360px) {
+    .lockup { gap: 10px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -220,42 +189,28 @@
 
   <main>
     <div class="hero">
-      <div class="mark">
-        <svg viewBox="0 0 300 300" role="img" aria-label="Ava">
-          <path d="M61 230 C25 203 24 150 47 108 C74 58 122 33 174 42 C225 51 258 91 258 142 C258 180 242 213 212 238 C228 197 226 164 208 137 C190 110 163 99 135 109 C108 118 98 145 102 174 C106 202 96 225 79 232 Q69 237 61 230Z" fill="currentColor"/>
-        </svg>
+      <div class="lockup">
+        <div class="mark">
+          <svg viewBox="0 0 300 300" role="img" aria-label="Ava">
+            <path d="M61 230 C25 203 24 150 47 108 C74 58 122 33 174 42 C225 51 258 91 258 142 C258 180 242 213 212 238 C228 197 226 164 208 137 C190 110 163 99 135 109 C108 118 98 145 102 174 C106 202 96 225 79 232 Q69 237 61 230Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <h1>Ava</h1>
       </div>
 
-      <h1>Ava</h1>
-
-      <p class="lede">A native macOS browser, built in Swift and SwiftUI on the Ladybird engine.</p>
-
-      <p class="features">
-        <span>Vertical tabs</span>
-        <span>Persistent Spaces</span>
-        <span>Native Mac controls</span>
-      </p>
+      <p class="lede">A native macOS browser, built on the Ladybird engine.</p>
 
       <nav class="links">
         <a class="primary" href="https://github.com/Ava-Browser/ava">
           View the repository
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg>
         </a>
-        <div class="secondary">
-          <a href="https://github.com/Ava-Browser/ava/tree/main/Documentation">Documentation</a>
-          <span class="dot" aria-hidden="true"></span>
-          <a href="https://github.com/Ava-Browser/ava/blob/main/CONTRIBUTING.md">Contributing</a>
-          <span class="dot" aria-hidden="true"></span>
-          <a href="https://github.com/Ava-Browser/ava-engine">Engine fork</a>
-        </div>
+        <a class="secondary" href="https://github.com/Ava-Browser/ava/tree/main/Documentation">Documentation</a>
       </nav>
     </div>
   </main>
 
-  <footer>
-    <span>Early development — not a daily driver yet.</span>
-    <span>BSD-2-Clause · Built on Ladybird</span>
-  </footer>
+  <footer>Early development — not a daily driver yet.</footer>
 
 </div>
 </body>
