@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ava — a native macOS browser on the Ladybird engine</title>
+<meta name="description" content="Ava is a native macOS browser built in Swift and SwiftUI on the Ladybird engine. Vertical tabs, persistent Spaces, native Mac controls. Early development.">
+<meta name="theme-color" content="#F3F1EB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1B1C1E" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="Ava — a native macOS browser">
+<meta property="og:description" content="Swift and SwiftUI on the Ladybird engine. Vertical tabs, persistent Spaces, native Mac controls.">
+<meta property="og:type" content="website">
+<link rel="icon" href="ava-lift.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #F3F1EB;
+    --ink: #242728;
+    --muted: #6B6E67;
+    --faint: #8A8D86;
+    --tile: #FAF9F6;
+    --line: rgba(36, 39, 40, .10);
+    --line-strong: rgba(36, 39, 40, .16);
+    --btn-bg: #242728;
+    --btn-ink: #F6F4EF;
+    --shadow: 0 1px 2px rgba(36, 39, 40, .06), 0 12px 32px -12px rgba(36, 39, 40, .18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1B1C1E;
+      --ink: #F3F1EB;
+      --muted: #9BA097;
+      --faint: #7C817A;
+      --tile: #242728;
+      --line: rgba(243, 241, 235, .10);
+      --line-strong: rgba(243, 241, 235, .18);
+      --btn-bg: #F3F1EB;
+      --btn-ink: #1B1C1E;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 12px 32px -12px rgba(0, 0, 0, .55);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    overflow: hidden;                    /* single page, never scrolls */
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 clamp(14px, 1.05vw + 8px, 17px)/1.5 -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .page {
+    height: 100dvh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(8px, 2vh, 24px);
+    padding: clamp(16px, 3.2vw, 40px) clamp(18px, 4vw, 48px);
+  }
+
+  /* ---------- top bar ---------- */
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: .82rem;
+    font-weight: 550;
+    letter-spacing: -.01em;
+    color: var(--muted);
+  }
+  .brand svg { width: 17px; height: 17px; display: block; }
+  .top-link {
+    font-size: .82rem;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 8px;
+    transition: color 140ms ease-out, background-color 140ms ease-out;
+  }
+  .top-link:hover { color: var(--ink); background: var(--line); }
+
+  /* ---------- hero ---------- */
+  main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+  }
+  .hero {
+    width: 100%;
+    min-width: 0;
+    max-width: 34rem;
+    text-align: center;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(14px, 2.4vh, 26px);
+    justify-items: center;
+  }
+
+  .mark {
+    width: clamp(64px, 9vh, 104px);
+    aspect-ratio: 1;
+    border-radius: 23.5%;
+    background: var(--tile);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    display: grid;
+    place-items: center;
+  }
+  .mark svg { width: 58%; height: 58%; display: block; color: var(--ink); }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2rem, 2.2vh + 2.4vw, 3.15rem);
+    font-weight: 600;
+    letter-spacing: -.035em;
+    line-height: 1.02;
+  }
+  h1 span {
+    display: block;
+    margin-top: .5em;
+    font-size: clamp(.95rem, 1.4vh + .35vw, 1.16rem);
+    font-weight: 450;
+    letter-spacing: -.012em;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+
+  .detail {
+    margin: 0;
+    max-width: 31rem;
+    color: var(--muted);
+    letter-spacing: -.005em;
+    text-wrap: pretty;
+  }
+  .detail strong { color: var(--ink); font-weight: 550; }
+
+  .state {
+    margin: 0;
+    font-size: .8rem;
+    letter-spacing: .01em;
+    color: var(--faint);
+  }
+  .state::before {
+    content: "";
+    display: inline-block;
+    width: 6px; height: 6px;
+    margin-right: 7px;
+    vertical-align: 1px;
+    border-radius: 50%;
+    background: #C9722B;
+    box-shadow: 0 0 0 3px color-mix(in srgb, #C9722B 18%, transparent);
+  }
+
+  /* ---------- links ---------- */
+  .links {
+    display: grid;
+    gap: clamp(12px, 1.8vh, 18px);
+    justify-items: center;
+  }
+  .primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border-radius: 11px;
+    background: var(--btn-bg);
+    color: var(--btn-ink);
+    font-size: .92rem;
+    font-weight: 550;
+    letter-spacing: -.008em;
+    text-decoration: none;
+    transition: transform 120ms ease-out, opacity 160ms ease-out;
+  }
+  .primary:hover { opacity: .9; }
+  .primary:active { transform: scale(.975); }
+  .primary svg { width: 15px; height: 15px; display: block; }
+
+  .secondary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 2px 6px;
+    max-width: 100%;
+    font-size: .88rem;
+  }
+  .secondary a {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 7px;
+    transition: color 140ms ease-out, background-color 140ms ease-out;
+  }
+  .secondary a:hover { color: var(--ink); background: var(--line); }
+  .secondary .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--line-strong); }
+
+  /* ---------- footnote ---------- */
+  footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 16px;
+    overflow-wrap: anywhere;
+    padding-top: clamp(8px, 1.6vh, 16px);
+    border-top: 1px solid var(--line);
+    font-size: .74rem;
+    color: var(--faint);
+    letter-spacing: .005em;
+  }
+  footer a { color: var(--faint); text-decoration: none; border-bottom: 1px solid transparent; }
+  footer a:hover { color: var(--muted); border-bottom-color: var(--line-strong); }
+
+  /* ---------- entrance ---------- */
+  .hero > * { animation: rise 520ms cubic-bezier(.22, .8, .28, 1) backwards; }
+  .hero > *:nth-child(1) { animation-delay: 40ms; }
+  .hero > *:nth-child(2) { animation-delay: 90ms; }
+  .hero > *:nth-child(3) { animation-delay: 140ms; }
+  .hero > *:nth-child(4) { animation-delay: 190ms; }
+  .hero > *:nth-child(5) { animation-delay: 240ms; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(7px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* ---------- tight viewports: keep it on one screen ---------- */
+  @media (max-height: 620px) {
+    .hero { gap: clamp(9px, 1.6vh, 14px); }
+    .mark { width: clamp(48px, 7vh, 64px); }
+    .detail { font-size: .9em; }
+    footer { font-size: .68rem; }
+  }
+  @media (max-height: 460px) {
+    .mark, .detail { display: none; }
+    h1 span { margin-top: .35em; }
+  }
+  @media (max-width: 480px) {
+    .detail { font-size: .92em; }
+    .secondary { row-gap: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero > * { animation: none; }
+    * { transition-duration: 1ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 300 300" aria-hidden="true">
+        <path d="M61 230 C25 203 24 150 47 108 C74 58 122 33 174 42 C225 51 258 91 258 142 C258 180 242 213 212 238 C228 197 226 164 208 137 C190 110 163 99 135 109 C108 118 98 145 102 174 C106 202 96 225 79 232 Q69 237 61 230Z" fill="currentColor"/>
+      </svg>
+      Ava Browser
+    </div>
+    <a class="top-link" href="https://github.com/Ava-Browser">GitHub&nbsp;↗</a>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div class="mark">
+        <svg viewBox="0 0 300 300" role="img" aria-label="Ava">
+          <path d="M61 230 C25 203 24 150 47 108 C74 58 122 33 174 42 C225 51 258 91 258 142 C258 180 242 213 212 238 C228 197 226 164 208 137 C190 110 163 99 135 109 C108 118 98 145 102 174 C106 202 96 225 79 232 Q69 237 61 230Z" fill="currentColor"/>
+        </svg>
+      </div>
+
+      <h1>Ava<span>A native macOS browser, built on the Ladybird engine.</span></h1>
+
+      <p class="detail">
+        Swift and SwiftUI for the interface, a hand-written C bridge into Ladybird for the web.
+        <strong>Vertical tabs</strong>, persistent <strong>Spaces</strong>, and native Mac controls —
+        an exploration of a calmer way to browse.
+      </p>
+
+      <p class="state">Early development. Buggy, incomplete, not yet a daily driver.</p>
+
+      <nav class="links">
+        <a class="primary" href="https://github.com/Ava-Browser/ava">
+          View the repository
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg>
+        </a>
+        <div class="secondary">
+          <a href="https://github.com/Ava-Browser/ava-engine">Engine fork</a>
+          <span class="dot" aria-hidden="true"></span>
+          <a href="https://github.com/Ava-Browser/ava/tree/main/Documentation">Documentation</a>
+          <span class="dot" aria-hidden="true"></span>
+          <a href="https://github.com/Ava-Browser/ava/blob/main/CONTRIBUTING.md">Contributing</a>
+          <span class="dot" aria-hidden="true"></span>
+          <a href="https://ladybird.org">Ladybird</a>
+        </div>
+      </nav>
+    </div>
+  </main>
+
+  <footer>
+    <span>Source under BSD-2-Clause. Independent project — not affiliated with Arc, Zen, or the Ladybird project.</span>
+    <a href="https://github.com/Ava-Browser">github.com/Ava-Browser</a>
+  </footer>
+
+</div>
+</body>
+</html>
